@@ -168,39 +168,33 @@
           {file.formattedSize}
         </p>
 
-        <div class="">
-          {#if comfyApp && file.type != 'dir'}
+        <div class="flex justify-between items-center">
+          <div>
+            {#if comfyApp && file.type != 'dir'}
+              <button
+                class="btn btn-link btn-sm p-0 no-underline text-accent"
+                on:click={async () => await onLoadWorkflow(file, comfyApp, toast)}
+                >{$t('common.btn.load')}</button
+              >
+            {/if}
             <button
               class="btn btn-link btn-sm p-0 no-underline text-accent"
-              on:click={async () => await onLoadWorkflow(file, comfyApp, toast)}
-              >{$t('common.btn.load')}</button
+              on:click={async () => await onCollect(file)}
+              >{$t('common.btn.save')}</button
             >
-          {/if}
-          <button
-            class="btn btn-link btn-sm p-0 no-underline text-accent"
-            on:click={async () => await onCollect(file)}
-            >{$t('common.btn.save')}</button
-          >
+          </div>
           {#if file.type === 'dir'}
             <button
               class="btn btn-link btn-sm p-0 no-underline text-accent"
               on:click={async () => await onDownloadDir(file)}
+              >{$t('common.btn.downloadAll')}</button
             >
-              <svg class="w-3 h-3 inline-block mr-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 10H18L12 16L6 10H11V3H13V10ZM4 19H20V12H22V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V12H4V19Z" fill="currentColor"/>
-              </svg>
-              {$t('common.btn.downloadAll')}
-            </button>
           {/if}
           <button
-            class="btn btn-link btn-sm p-0 no-underline text-error float-right"
+            class="btn btn-link btn-sm p-0 no-underline text-error"
             on:click={async () => await onDelete(file)}
+            >{$t('common.btn.delete')}</button
           >
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 2v4h6v2h-2v14H4V8H2V6h6V2h8zm-2 2h-4v2h4V4zm0 4H6v12h12V8h-4zm-5 2h2v8H9v-8zm6 0h-2v8h2v-8z" fill="#f77"/>
-            </svg>
-            {$t('common.btn.delete')}
-          </button>
         </div>
       </div>
     {/if}
