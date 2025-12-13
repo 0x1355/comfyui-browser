@@ -105,6 +105,18 @@
     folderPath = dir.path;
   }
 
+  async function onDownloadDir(dir: any) {
+    const url = `${comfyUrl}/browser/files/download-zip?folder_type=${folderType}&folder_path=${encodeURIComponent(dir.path)}`;
+
+    // Create a temporary link and trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${dir.name}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   async function onClickPath(index: number) {
     if (index === -1) {
       folderPath = '';
@@ -169,6 +181,17 @@
             on:click={async () => await onCollect(file)}
             >{$t('common.btn.save')}</button
           >
+          {#if file.type === 'dir'}
+            <button
+              class="btn btn-link btn-sm p-0 no-underline text-accent"
+              on:click={async () => await onDownloadDir(file)}
+            >
+              <svg class="w-3 h-3 inline-block mr-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 10H18L12 16L6 10H11V3H13V10ZM4 19H20V12H22V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V12H4V19Z" fill="currentColor"/>
+              </svg>
+              {$t('common.btn.downloadAll')}
+            </button>
+          {/if}
           <button
             class="btn btn-link btn-sm p-0 no-underline text-error float-right"
             on:click={async () => await onDelete(file)}

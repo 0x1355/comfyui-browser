@@ -14,7 +14,8 @@
       "save": "Save",
       "delete": "Delete",
       "add": "Add",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "downloadAll": "Download all"
     }
   },
   "collectionsTab": {

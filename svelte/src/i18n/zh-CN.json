@@ -14,7 +14,8 @@
       "save": "收藏",
       "delete": "删除",
       "add": "新增",
-      "refresh": "刷新"
+      "refresh": "刷新",
+      "downloadAll": "下载全部"
     }
   },
   "collectionsTab": {

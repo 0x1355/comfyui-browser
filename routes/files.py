@@ -3,9 +3,11 @@ import json
 from os import path
 import os
 import shutil
+import zipfile
+import io
 
 from ..utils import get_target_folder_files, get_parent_path, get_info_filename, \
-    image_extensions, video_extensions
+    image_extensions, video_extensions, white_extensions
 
 # folder_path, folder_type
 async def api_get_files(request):
@@ -116,4 +118,53 @@ async def api_view_file(request):
         body=media_file,
         content_type=content_type,
         headers={"Content-Disposition": f"filename=\"{filename}\""}
+    )
+
+
+# folder_path, folder_type
+async def api_download_directory_zip(request):
+    folder_type = request.query.get("folder_type", "outputs")
+    folder_path = request.query.get("folder_path", "")
+
+    if '..' in folder_path:
+        return web.Response(status=400)
+
+    parent_path = get_parent_path(folder_type)
+    target_path = path.join(parent_path, folder_path)
+
+    if not path.exists(target_path) or not path.isdir(target_path):
+        return web.Response(status=404)
+
+    # Create zip in memory
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for root, dirs, files in os.walk(target_path):
+            # Filter out hidden directories
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
+
+            for file in files:
+                # Skip hidden files and files not in whitelist
+                if file.startswith('.'):
+                    continue
+                ext = path.splitext(file)[1].lower()
+                if ext not in white_extensions:
+                    continue
+
+                file_path = path.join(root, file)
+                # Preserve directory structure relative to target_path
+                arcname = path.relpath(file_path, target_path)
+                zip_file.write(file_path, arcname)
+
+    zip_buffer.seek(0)
+
+    # Use the directory name for the zip filename
+    dir_name = path.basename(folder_path) if folder_path else "download"
+    zip_filename = f"{dir_name}.zip"
+
+    return web.Response(
+        body=zip_buffer.read(),
+        content_type='application/zip',
+        headers={
+            "Content-Disposition": f'attachment; filename="{zip_filename}"'
+        }
     )
