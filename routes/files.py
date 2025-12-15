@@ -5,9 +5,10 @@ import os
 import shutil
 import zipfile
 import io
+from urllib.parse import unquote
 
 from ..utils import get_target_folder_files, get_parent_path, get_info_filename, \
-    image_extensions, video_extensions, white_extensions
+    image_extensions, video_extensions, white_extensions, log
 
 # folder_path, folder_type
 async def api_get_files(request):
@@ -126,14 +127,24 @@ async def api_download_directory_zip(request):
     folder_type = request.query.get("folder_type", "outputs")
     folder_path = request.query.get("folder_path", "")
 
+    # Handle potential double-encoding from proxies
+    folder_path = unquote(folder_path)
+
     if '..' in folder_path:
-        return web.Response(status=400)
+        return web.Response(status=400, text="Invalid path")
 
     parent_path = get_parent_path(folder_type)
     target_path = path.join(parent_path, folder_path)
 
-    if not path.exists(target_path) or not path.isdir(target_path):
-        return web.Response(status=404)
+    log(f"download-zip: folder_type={folder_type}, folder_path={folder_path}, target_path={target_path}")
+
+    if not path.exists(target_path):
+        log(f"download-zip: path does not exist: {target_path}")
+        return web.Response(status=404, text=f"Path not found: {folder_path}")
+
+    if not path.isdir(target_path):
+        log(f"download-zip: path is not a directory: {target_path}")
+        return web.Response(status=404, text=f"Not a directory: {folder_path}")
 
     # Create zip in memory
     zip_buffer = io.BytesIO()
