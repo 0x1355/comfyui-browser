@@ -54,7 +54,8 @@
     "Failed to add to Saves": "收藏失败。请在控制台查看详情。",
     "You want to delete this file?": "确认删除这个文件？",
     "Deleted the file": "删除成功：",
-    "Failed to delete the file": "删除失败。请在控制台查看详情。"
+    "Failed to delete the file": "删除失败。请在控制台查看详情。",
+    "Failed to download": "下载失败。请在控制台查看详情。"
   },
   "downloadHistory": {
     "Auto Refresh": "自动刷新"

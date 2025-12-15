@@ -27,6 +27,7 @@
   let searchQuery = '';
   let searchRegex = new RegExp('');
   let scrollTop = 0;
+  let downloadingDir: string | null = null;
 
   $: tt = function(key: string) {
     return $t('filesList.' + key);
@@ -108,13 +109,26 @@
   async function onDownloadDir(dir: any) {
     const url = `${comfyUrl}/browser/files/download-zip?folder_type=${folderType}&folder_path=${encodeURIComponent(dir.path)}`;
 
-    // Create a temporary link and trigger download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${dir.name}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    downloadingDir = dir.path;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `${dir.name}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      toast.show(false, '', tt('Failed to download'));
+    } finally {
+      downloadingDir = null;
+    }
   }
 
   async function onClickPath(index: number) {
@@ -186,9 +200,14 @@
           {#if file.type === 'dir'}
             <button
               class="btn btn-link btn-sm p-0 no-underline text-accent"
+              disabled={downloadingDir === file.path}
               on:click={async () => await onDownloadDir(file)}
-              >{$t('common.btn.downloadAll')}</button
             >
+              {#if downloadingDir === file.path}
+                <span class="loading loading-spinner loading-xs"></span>
+              {/if}
+              {$t('common.btn.downloadAll')}
+            </button>
           {/if}
           <button
             class="btn btn-link btn-sm p-0 no-underline text-error"

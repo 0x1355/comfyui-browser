@@ -54,7 +54,8 @@
     "Failed to add to Saves": "Failed to add to Saves. Please check the ComfyUI server.",
     "You want to delete this file?": "You want to delete this file?",
     "Deleted the file": "Deleted the file ",
-    "Failed to delete the file": "Failed to delete the file. Please check the ComfyUI server."
+    "Failed to delete the file": "Failed to delete the file. Please check the ComfyUI server.",
+    "Failed to download": "Failed to download. Please check the ComfyUI server."
   },
   "downloadHistory": {
     "Auto Refresh": "Auto Refresh"
